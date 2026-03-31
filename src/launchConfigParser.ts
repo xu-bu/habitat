@@ -8,48 +8,6 @@ export interface LaunchConfig {
   args: string[];
 }
 
-/**
- * Parse a .env file into key-value pairs.
- * Supports KEY=VALUE, KEY="VALUE", KEY='VALUE', comments (#), and empty lines.
- */
-function parseEnvFile(filePath: string): Record<string, string> {
-  const env: Record<string, string> = {};
-
-  if (!fs.existsSync(filePath)) {
-    vscode.window.showWarningMessage(`Habitat: envFile not found: ${filePath}`);
-    return env;
-  }
-
-  const content = fs.readFileSync(filePath, 'utf-8');
-  for (const line of content.split('\n')) {
-    const trimmed = line.trim();
-
-    // Skip empty lines and comments
-    if (!trimmed || trimmed.startsWith('#')) {
-      continue;
-    }
-
-    const eqIndex = trimmed.indexOf('=');
-    if (eqIndex === -1) {
-      continue;
-    }
-
-    const key = trimmed.substring(0, eqIndex).trim();
-    let value = trimmed.substring(eqIndex + 1).trim();
-
-    // Strip surrounding quotes
-    if (
-      (value.startsWith('"') && value.endsWith('"')) ||
-      (value.startsWith("'") && value.endsWith("'"))
-    ) {
-      value = value.slice(1, -1);
-    }
-
-    env[key] = value;
-  }
-
-  return env;
-}
 
 /**
  * Resolve VS Code variables in a string (limited subset).
@@ -125,7 +83,7 @@ function stripJsonComments(text: string): string {
 
 /**
  * Read and parse all configurations from .vscode/launch.json.
- * Returns only configurations that have `env` or `envFile` fields.
+ * Returns only configurations that have `env` fields.
  */
 export function getConfigurations(workspaceFolder: string): LaunchConfig[] {
   const launchJsonPath = path.join(workspaceFolder, '.vscode', 'launch.json');
