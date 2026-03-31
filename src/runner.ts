@@ -30,7 +30,7 @@ function getRunCommand(filePath: string): { cmd: string; args: string[] } | null
     case '.go':
       return { cmd: 'go', args: ['run', filePath] };
     default:
-      return null;
+      return { cmd: filePath, args: [] };
   }
 }
 

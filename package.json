@@ -1,82 +1,84 @@
 {
-  "name": "habitat",
-  "displayName": "Habitat",
-  "description": "Run code with environment variables from launch.json configurations",
-  "version": "0.1.0",
-  "publisher": "xu-bu",
-  "engines": {
-    "vscode": "^1.85.0"
-  },
-  "categories": [
-    "Other"
-  ],
-  "main": "./dist/extension.js",
-  "contributes": {
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "habitat-sidebar",
-          "title": "Habitat",
-          "icon": "resources/icon.svg"
-        }
-      ]
+    "name": "habitat",
+    "repository": "github:xu-bu/habitat",
+    "displayName": "Habitat",
+    "description": "Run code with environment variables from launch.json configurations",
+    "version": "0.1.0",
+    "publisher": "xu-bu",
+    "engines": {
+        "vscode": "^1.85.0"
     },
-    "views": {
-      "habitat-sidebar": [
-        {
-          "id": "habitat.sidebarView",
-          "name": "Run with Env",
-          "type": "webview"
-        }
-      ]
-    },
-    "commands": [
-      {
-        "command": "habitat.run",
-        "title": "Habitat: Run Active File with Selected Env"
-      },
-      {
-        "command": "habitat.refresh",
-        "title": "Habitat: Refresh Configurations"
-      }
+    "categories": [
+        "Other"
     ],
-    "keybindings": [
-      {
-        "command": "habitat.run",
-        "key": "ctrl+f5",
-        "mac": "cmd+f5",
-        "when": "editorTextFocus"
-      }
-    ],
-    "configuration": {
-      "title": "Habitat",
-      "properties": {
-        "habitat.typescriptRunner": {
-          "type": "string",
-          "default": "npx tsx",
-          "description": "Command to run TypeScript files (e.g. 'npx tsx', 'ts-node', 'npx ts-node')"
+    "main": "./dist/extension.js",
+    "contributes": {
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "habitat-sidebar",
+                    "title": "Habitat",
+                    "icon": "resources/icon.svg"
+                }
+            ]
         },
-        "habitat.pythonCommand": {
-          "type": "string",
-          "default": "python",
-          "description": "Command to run Python files (e.g. 'python', 'python3')"
+        "views": {
+            "habitat-sidebar": [
+                {
+                    "id": "habitat.sidebarView",
+                    "name": "Run with Env",
+                    "type": "webview"
+                }
+            ]
+        },
+        "commands": [
+            {
+                "command": "habitat.run",
+                "title": "Habitat: Run Active File with Selected Env"
+            },
+            {
+                "command": "habitat.refresh",
+                "title": "Habitat: Refresh Configurations"
+            }
+        ],
+        "keybindings": [
+            {
+                "command": "habitat.run",
+                "key": "ctrl+f5",
+                "mac": "cmd+f5",
+                "when": "editorTextFocus"
+            }
+        ],
+        "configuration": {
+            "title": "Habitat",
+            "properties": {
+                "habitat.typescriptRunner": {
+                    "type": "string",
+                    "default": "npx tsx",
+                    "description": "Command to run TypeScript files (e.g. 'npx tsx', 'ts-node', 'npx ts-node')"
+                },
+                "habitat.pythonCommand": {
+                    "type": "string",
+                    "default": "python",
+                    "description": "Command to run Python files (e.g. 'python', 'python3')"
+                }
+            }
         }
-      }
-    }
-  },
-  "scripts": {
-    "vscode:prepublish": "npm run build",
-    "build": "node esbuild.js --production",
-    "watch": "node esbuild.js --watch",
-    "compile": "node esbuild.js",
-    "lint": "eslint src --ext ts",
-    "package": "vsce package --no-dependencies"
-  },
-  "devDependencies": {
-    "@types/vscode": "^1.85.0",
-    "@types/node": "^20.0.0",
-    "esbuild": "^0.24.0",
-    "typescript": "^5.5.0",
-    "@vscode/vsce": "^3.0.0"
-  }
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run build",
+        "build": "node esbuild.js --production",
+        "watch": "node esbuild.js --watch",
+        "compile": "node esbuild.js",
+        "lint": "eslint src --ext ts",
+        "package": "vsce package --no-dependencies"
+    },
+    "devDependencies": {
+        "@types/vscode": "^1.85.0",
+        "@types/node": "^20.0.0",
+        "esbuild": "^0.24.0",
+        "typescript": "^5.5.0",
+        "@vscode/vsce": "^3.0.0"
+    },
+    "license": "MIT"
 }

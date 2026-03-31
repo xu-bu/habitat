@@ -54,6 +54,11 @@ export class SidebarViewProvider implements vscode.WebviewViewProvider {
    */
   public onRunRequested?: () => void;
 
+  /**
+   * Called when the user clicks the edit button next to a config.
+   */
+  public onEditRequested?: (configName: string) => void;
+
   public resolveWebviewView(
     webviewView: vscode.WebviewView,
     _context: vscode.WebviewViewResolveContext,
@@ -79,6 +84,11 @@ export class SidebarViewProvider implements vscode.WebviewViewProvider {
           break;
         case 'selectConfig':
           this._selectedConfigName = message.configName;
+          break;
+        case 'editConfig':
+          if (this.onEditRequested) {
+            this.onEditRequested(message.configName);
+          }
           break;
         case 'ready':
           // Webview loaded, send current configs
@@ -142,6 +152,22 @@ export class SidebarViewProvider implements vscode.WebviewViewProvider {
 
     .config-select:hover {
       background: var(--vscode-dropdown-background);
+    }
+
+    .edit-btn {
+      background: transparent;
+      color: var(--vscode-icon-foreground);
+      border: 1px solid transparent;
+      border-radius: 3px;
+      cursor: pointer;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .edit-btn:hover {
+      background: var(--vscode-toolbar-hoverBackground);
+      color: var(--vscode-toolbar-hoverOutline);
     }
 
     .run-btn {
@@ -254,9 +280,17 @@ export class SidebarViewProvider implements vscode.WebviewViewProvider {
   <div id="main-content">
     <div class="section">
       <div class="section-label">Environment</div>
-      <select class="config-select" id="configSelect">
-        <option value="">Loading...</option>
-      </select>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <select class="config-select" id="configSelect" style="flex: 1;">
+          <option value="">Loading...</option>
+        </select>
+        <button id="editBtn" title="Edit in launch.json" class="edit-btn" disabled>
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor">
+             <path d="M13.23 1H2.77L1 2.77v10.46L2.77 15h10.46l1.77-1.77V2.77L13.23 1zM14 13.23l-.77.77H2.77l-.77-.77V2.77l.77-.77h10.46l.77.77v10.46z"/>
+             <path d="M4 4h8v1H4zM4 7h8v1H4zM4 10h5v1H4z"/>
+          </svg>
+        </button>
+      </div>
     </div>
 
     <div class="section">
@@ -285,6 +319,7 @@ export class SidebarViewProvider implements vscode.WebviewViewProvider {
     const vscode = acquireVsCodeApi();
     const configSelect = document.getElementById('configSelect');
     const runBtn = document.getElementById('runBtn');
+    const editBtn = document.getElementById('editBtn');
     const envPreview = document.getElementById('envPreview');
     const mainContent = document.getElementById('main-content');
     const emptyState = document.getElementById('emptyState');
@@ -313,12 +348,14 @@ export class SidebarViewProvider implements vscode.WebviewViewProvider {
         mainContent.style.display = 'none';
         emptyState.style.display = 'block';
         runBtn.disabled = true;
+        editBtn.disabled = true;
         return;
       }
 
       mainContent.style.display = 'block';
       emptyState.style.display = 'none';
       runBtn.disabled = false;
+      editBtn.disabled = false;
 
       configNames.forEach((name) => {
         const option = document.createElement('option');
@@ -362,6 +399,14 @@ export class SidebarViewProvider implements vscode.WebviewViewProvider {
     configSelect.addEventListener('change', () => {
       const configName = configSelect.value;
       vscode.postMessage({ command: 'selectConfig', configName });
+    });
+
+    // Edit button click
+    editBtn.addEventListener('click', () => {
+      const configName = configSelect.value;
+      if (configName) {
+        vscode.postMessage({ command: 'editConfig', configName });
+      }
     });
 
     // Tell extension we're ready

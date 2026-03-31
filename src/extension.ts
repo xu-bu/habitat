@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 import { SidebarViewProvider } from './sidebarViewProvider';
 import { getConfigurations } from './launchConfigParser';
 import { runFile } from './runner';
@@ -73,6 +74,37 @@ export function activate(context: vscode.ExtensionContext): void {
     executeRun(workspaceFolder);
   };
 
+  // Wire sidebar edit button to open launch.json
+  sidebarProvider.onEditRequested = (configName) => {
+    if (!workspaceFolder) {
+      vscode.window.showErrorMessage('Habitat: No workspace folder found to open launch.json');
+      return;
+    }
+
+    const launchJsonPath = path.join(workspaceFolder, '.vscode', 'launch.json');
+    vscode.workspace.openTextDocument(launchJsonPath).then(
+      (doc) => {
+        vscode.window.showTextDocument(doc).then((editor) => {
+          // Find the configuration string in the file and select it
+          const text = doc.getText();
+          const configIndex = text.indexOf(`"name": "${configName}"`);
+          if (configIndex !== -1) {
+            const position = doc.positionAt(configIndex);
+            // highlight the "name": "XYZ" line
+            const matchLength = `"name": "${configName}"`.length;
+            const endPosition = doc.positionAt(configIndex + matchLength);
+            const range = new vscode.Range(position, endPosition);
+            editor.selection = new vscode.Selection(position, endPosition);
+            editor.revealRange(range, vscode.TextEditorRevealType.InCenter);
+          }
+        });
+      },
+      (err) => {
+        vscode.window.showErrorMessage(`Habitat: Failed to open launch.json: ${err}`);
+      }
+    );
+  };
+
   // Also watch for workspace folder changes
   context.subscriptions.push(
     vscode.workspace.onDidChangeWorkspaceFolders(() => {
@@ -122,16 +154,44 @@ function executeRun(workspaceFolder: string | undefined): void {
 
   // Save the file before running
   activeEditor.document.save().then(() => {
-    log(`Running: ${filePath} with config "${selectedConfig.name}" and args: [${selectedConfig.args?.join(', ') || ''}]`);
-    runFile(filePath, selectedConfig.env, selectedConfig.args || []);
+    let targetFile = filePath;
+    if (selectedConfig.program) {
+      targetFile = resolveVariables(selectedConfig.program, workspaceFolder || '', filePath);
+    }
+
+    const resolvedArgs = (selectedConfig.args || []).map(arg => 
+      resolveVariables(arg, workspaceFolder || '', filePath)
+    );
+
+    log(`Running: ${targetFile} with config "${selectedConfig.name}" and args: [${resolvedArgs.join(', ')}]`);
+    runFile(targetFile, selectedConfig.env, resolvedArgs);
 
     const envCount = Object.keys(selectedConfig.env).length;
-    const argsCount = selectedConfig.args ? selectedConfig.args.length : 0;
+    const argsCount = resolvedArgs.length;
     vscode.window.setStatusBarMessage(
       `Habitat: Running with "${selectedConfig.name}" (${envCount} env vars, ${argsCount} args)`,
       3000
     );
   });
+}
+
+function resolveVariables(
+  str: string,
+  workspaceFolder: string,
+  activeFilePath: string
+): string {
+  const fileBasename = path.basename(activeFilePath);
+  const fileDirname = path.dirname(activeFilePath);
+  const relativeFile = path.relative(workspaceFolder, activeFilePath);
+  const relativeFileDirname = path.dirname(relativeFile);
+
+  return str
+    .replace(/\$\{workspaceFolder\}/g, workspaceFolder)
+    .replace(/\$\{file\}/g, activeFilePath)
+    .replace(/\$\{fileBasename\}/g, fileBasename)
+    .replace(/\$\{fileDirname\}/g, fileDirname)
+    .replace(/\$\{relativeFile\}/g, relativeFile)
+    .replace(/\$\{relativeFileDirname\}/g, relativeFileDirname);
 }
 
 export function deactivate(): void {

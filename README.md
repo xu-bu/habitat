@@ -6,14 +6,14 @@ Instead of writing custom scripts or manually sourcing `.env` files every time y
 
 ## Features
 
-- **Sidebar Panel:** Adds a "Habitat" icon to your Activity Bar with a clean, native-looking dropdown.
-- **launch.json Integration:** Automatically reads your existing `.vscode/launch.json` and extracts `env` and `args` fields.
+- **Sidebar Panel:** Adds a "Habitat" icon to your Activity Bar with a clean dropdown and a quick-access "Edit" button that jumps directly to the selected config in your `launch.json`.
+- **launch.json Integration:** Automatically reads your existing `.vscode/launch.json` and extracts `env`, `args`, and `program` fields.
 - **Language Support:** Automatically detects the language of your active file completely out-of-the-box:
   - `.py` (Python)
   - `.js`, `.mjs`, `.cjs` (Node.js)
   - `.ts`, `.mts`, `.cts` (TypeScript via `npx tsx`)
   - `.go` (Go)
-- **Variable Substitution:** Sustitutes standard VS Code variables like `${workspaceFolder}` and `${env:VAR_NAME}` in your configuration files.
+- **Variable Substitution:** Substitutes standard VS Code variables like `${workspaceFolder}` and `${env:VAR_NAME}` in your configurations. Also perfectly resolves file variables like `${file}`, `${fileBasename}`, `${fileDirname}`, `${relativeFile}`, and `${relativeFileDirname}` dynamically at runtime inside the `args` and `program` arrays.
 - **Keyboard Shortcut:** Quickly run the active file using <kbd>Ctrl</kbd> + <kbd>F5</kbd> (<kbd>Cmd</kbd> + <kbd>F5</kbd> on macOS).
 
 ## Usage
@@ -33,20 +33,25 @@ Instead of writing custom scripts or manually sourcing `.env` files every time y
          },
          "args": ["--verbose"]
        },
-       {
-         "name": "Staging DB",
-         "type": "python",
-         "request": "launch",
-         "env": {
-           "DB_HOST": "staging.database.net",
-           "API_KEY": "${env:SECRET_API_KEY}"
-         }
-       }
-     ]
-   }
-   ```
+        {
+          "name": "Jest Test File",
+          "type": "node",
+          "request": "launch",
+          "program": "${workspaceFolder}/node_modules/.bin/jest",
+          "args": [
+            "--runTestsByPath",
+            "${relativeFile}",
+            "--forceExit"
+          ],
+          "env": {
+            "NODE_ENV": "test"
+          }
+        }
+      ]
+    }
+    ```
 
-2. **Select & Run:** Open the Habitat sidebar, pick your configuration from the dropdown, and click **Run with Env** (or press `Ctrl+F5`). Ensure the file you want to run is the active tab in your editor.
+2. **Select & Run:** Open the Habitat sidebar, pick your configuration from the dropdown, and click **Run with Env** (or press `Ctrl+F5`). Ensure the file you want to run is the active tab in your editor. You can click the "✎" edit button to quickly jump your cursor to the selected configuration directly inside `launch.json`.
 
 ## Extension Settings
 

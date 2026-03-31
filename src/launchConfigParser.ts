@@ -6,6 +6,7 @@ export interface LaunchConfig {
   name: string;
   env: Record<string, string>;
   args: string[];
+  program?: string;
 }
 
 
@@ -137,12 +138,18 @@ export function getConfigurations(workspaceFolder: string): LaunchConfig[] {
       args = config.args.map((a: any) => String(a));
     }
 
-    // Include configs that have env vars or args
-    if (Object.keys(env).length > 0 || args.length > 0) {
+    let program: string | undefined;
+    if (typeof config.program === 'string') {
+      program = config.program;
+    }
+
+    // Include configs that have env vars or args or program
+    if (Object.keys(env).length > 0 || args.length > 0 || program) {
       configurations.push({
         name: config.name,
         env,
         args,
+        program,
       });
     }
   }
