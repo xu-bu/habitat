@@ -12,6 +12,7 @@ Instead of writing custom scripts or manually sourcing `.env` files every time y
   - `.py` (Python)
   - `.js`, `.mjs`, `.cjs` (Node.js)
   - `.ts`, `.mts`, `.cts` (TypeScript via `npx tsx`)
+  - `.test.js` (Jest)
   - `.go` (Go)
 - **Variable Substitution:** Substitutes standard VS Code variables like `${workspaceFolder}` and `${env:VAR_NAME}` in your configurations. Also perfectly resolves file variables like `${file}`, `${fileBasename}`, `${fileDirname}`, `${relativeFile}`, and `${relativeFileDirname}` dynamically at runtime inside the `args` and `program` arrays.
 - **Keyboard Shortcut:** Quickly run the active file using <kbd>Ctrl</kbd> + <kbd>F5</kbd> (<kbd>Cmd</kbd> + <kbd>F5</kbd> on macOS).
