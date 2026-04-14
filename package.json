@@ -3,7 +3,7 @@
     "repository": "github:xu-bu/habitat",
     "displayName": "Habitat",
     "description": "Run code with environment variables from launch.json configurations",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "publisher": "xu-bu",
     "engines": {
         "vscode": "^1.85.0"
@@ -71,7 +71,8 @@
         "watch": "node esbuild.js --watch",
         "compile": "node esbuild.js",
         "lint": "eslint src --ext ts",
-        "package": "vsce package --no-dependencies"
+        "package": "npm version patch && vsce package --no-dependencies",
+        "publish":"npx ovsx publish [xxx.vsix] -p [your-pat-token]"
     },
     "devDependencies": {
         "@types/vscode": "^1.85.0",
