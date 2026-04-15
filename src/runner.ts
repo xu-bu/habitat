@@ -81,6 +81,7 @@ function getPythonRunConfig(
  */
 function getRunCommand(
   filePath: string,
+  workspaceFolder: string,
 ): { cmd: string; args: string[]; cwd?: string } | null {
   const ext = path.extname(filePath).toLowerCase();
   const config = vscode.workspace.getConfiguration("habitat");
@@ -94,6 +95,14 @@ function getRunCommand(
     case ".js":
     case ".mjs":
     case ".cjs":
+      // Check if it's a test file
+      if (filePath.toLowerCase().includes("test")) {
+        return {
+          cmd: "yarn",
+          args: ["test", "--runTestsByPath", filePath],
+          cwd: workspaceFolder,
+        };
+      }
       return { cmd: "node", args: [filePath], cwd: path.dirname(filePath) };
     case ".ts":
     case ".mts":
@@ -139,8 +148,12 @@ export function runFile(
   filePath: string,
   env: Record<string, string>,
   extraArgs: string[] = [],
+  workspaceFolder?: string,
 ): void {
-  const runInfo = getRunCommand(filePath);
+  const runInfo = getRunCommand(
+    filePath,
+    workspaceFolder || path.dirname(filePath),
+  );
 
   if (!runInfo) {
     const ext = path.extname(filePath);
