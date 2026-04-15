@@ -96,7 +96,7 @@ function getRunCommand(
     case ".mjs":
     case ".cjs":
       // Check if it's a test file
-      if (filePath.toLowerCase().includes("test")) {
+      if (filePath.toLowerCase().includes("test.js")) {
         return {
           cmd: "yarn",
           args: ["test", "--runTestsByPath", filePath],
