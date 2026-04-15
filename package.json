@@ -8,7 +8,7 @@
     "repository": "github:xu-bu/habitat",
     "displayName": "Habitat",
     "description": "Run code with environment variables from launch.json configurations",
-    "version": "0.1.6",
+    "version": "0.1.7",
     "publisher": "xu-bu",
     "engines": {
         "vscode": "^1.85.0"
