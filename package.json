@@ -1,5 +1,10 @@
 {
     "name": "habitat",
+    "icon": "images/icon.png",
+    "galleryBanner": {
+        "color": "#1e1e2e",
+        "theme": "dark"
+    },
     "repository": "github:xu-bu/habitat",
     "displayName": "Habitat",
     "description": "Run code with environment variables from launch.json configurations",
