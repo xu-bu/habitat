@@ -21,8 +21,12 @@ export function activate(context: vscode.ExtensionContext): void {
   const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
   log(`Workspace folder: ${workspaceFolder || "NONE"}`);
 
+  const extensionVersion = context.extension.packageJSON.version;
   // Create sidebar provider
-  sidebarProvider = new SidebarViewProvider(context.extensionUri);
+  sidebarProvider = new SidebarViewProvider(
+    context.extensionUri,
+    extensionVersion,
+  );
 
   // Register the webview view provider
   context.subscriptions.push(

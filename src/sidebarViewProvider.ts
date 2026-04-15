@@ -1,14 +1,17 @@
-import * as vscode from 'vscode';
-import { LaunchConfig } from './launchConfigParser';
+import * as vscode from "vscode";
+import { LaunchConfig } from "./launchConfigParser";
 
 export class SidebarViewProvider implements vscode.WebviewViewProvider {
-  public static readonly viewType = 'habitat.sidebarView';
+  public static readonly viewType = "habitat.sidebarView";
 
   private _view?: vscode.WebviewView;
   private _configs: LaunchConfig[] = [];
   private _selectedConfigName: string | null = null;
 
-  constructor(private readonly _extensionUri: vscode.Uri) {}
+  constructor(
+    private readonly _extensionUri: vscode.Uri,
+    private readonly _version: string,
+  ) {}
 
   /**
    * Update the configurations displayed in the dropdown.
@@ -17,7 +20,10 @@ export class SidebarViewProvider implements vscode.WebviewViewProvider {
     this._configs = configs;
 
     // If selected config no longer exists, reset
-    if (this._selectedConfigName && !configs.find((c) => c.name === this._selectedConfigName)) {
+    if (
+      this._selectedConfigName &&
+      !configs.find((c) => c.name === this._selectedConfigName)
+    ) {
       this._selectedConfigName = configs.length > 0 ? configs[0].name : null;
     }
 
@@ -28,7 +34,7 @@ export class SidebarViewProvider implements vscode.WebviewViewProvider {
 
     if (this._view) {
       this._view.webview.postMessage({
-        command: 'updateConfigs',
+        command: "updateConfigs",
         configs: configs.map((c) => c.name),
         selected: this._selectedConfigName,
       });
@@ -62,7 +68,7 @@ export class SidebarViewProvider implements vscode.WebviewViewProvider {
   public resolveWebviewView(
     webviewView: vscode.WebviewView,
     _context: vscode.WebviewViewResolveContext,
-    _token: vscode.CancellationToken
+    _token: vscode.CancellationToken,
   ): void {
     this._view = webviewView;
 
@@ -76,21 +82,21 @@ export class SidebarViewProvider implements vscode.WebviewViewProvider {
     // Handle messages from the webview
     webviewView.webview.onDidReceiveMessage((message) => {
       switch (message.command) {
-        case 'run':
+        case "run":
           this._selectedConfigName = message.configName;
           if (this.onRunRequested) {
             this.onRunRequested();
           }
           break;
-        case 'selectConfig':
+        case "selectConfig":
           this._selectedConfigName = message.configName;
           break;
-        case 'editConfig':
+        case "editConfig":
           if (this.onEditRequested) {
             this.onEditRequested(message.configName);
           }
           break;
-        case 'ready':
+        case "ready":
           // Webview loaded, send current configs
           this.updateConfigs(this._configs);
           break;
@@ -307,6 +313,13 @@ export class SidebarViewProvider implements vscode.WebviewViewProvider {
     </div>
 
     <div id="envPreview" class="env-preview" style="display: none;"></div>
+
+    <div class="section">
+      <div class="section-label">Version</div>
+      <div style="font-size: 11px; color: var(--vscode-descriptionForeground);">
+        Habitat v${this._version}
+      </div>
+    </div>
   </div>
 
   <div id="emptyState" class="empty-state" style="display: none;">
