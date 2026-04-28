@@ -99,7 +99,7 @@ function getRunCommand(
       if (filePath.toLowerCase().includes("test.js")) {
         return {
           cmd: "yarn",
-          args: ["test", "--runTestsByPath", filePath],
+          args: ["test"],
           cwd: workspaceFolder,
         };
       }
